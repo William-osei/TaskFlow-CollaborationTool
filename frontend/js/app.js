@@ -3,8 +3,35 @@
 // API Base URL
 const API_BASE = 'http://localhost:5000';
 
+// Demo mode detection (for GitHub Pages)
+const DEMO_MODE = window.location.hostname.includes('github.io') || window.location.protocol === 'file:';
+
 // Current user state
 let currentUser = null;
+
+// Demo data for GitHub Pages
+const DEMO_DATA = {
+    users: [
+        { id: 1, first_name: 'Admin', last_name: 'User', email: 'admin@taskflow.com', role: 'admin', is_active: true, last_login: '2025-06-13T11:03:17.142438' },
+        { id: 2, first_name: 'Test', last_name: 'User', email: 'test@taskflow.com', role: 'member', is_active: true, last_login: null },
+        { id: 3, first_name: 'Demo', last_name: 'Developer', email: 'demo@taskflow.com', role: 'member', is_active: true, last_login: '2025-06-13T10:26:05.689004' },
+        { id: 4, first_name: 'Project', last_name: 'Manager', email: 'pm@taskflow.com', role: 'admin', is_active: true, last_login: '2025-06-12T15:30:22.123456' },
+        { id: 5, first_name: 'Team', last_name: 'Lead', email: 'lead@taskflow.com', role: 'member', is_active: true, last_login: '2025-06-13T09:45:33.987654' }
+    ],
+    projects: [
+        { id: 1, name: 'TaskFlow Enhancement Project', description: 'Rebuilding the TaskFlow system with modern technologies', status: 'ACTIVE', created_at: '2025-06-13T10:00:44.719357', owner_id: 1 },
+        { id: 2, name: 'Mobile App Development', description: 'Creating a mobile companion app for TaskFlow', status: 'ACTIVE', created_at: '2025-06-12T14:30:22.555444', owner_id: 4 },
+        { id: 3, name: 'Database Migration', description: 'Migrating from SQLite to PostgreSQL for production', status: 'COMPLETED', created_at: '2025-06-10T09:15:33.111222', owner_id: 1 }
+    ],
+    tasks: [
+        { id: 1, title: 'Design new dashboard layout', description: 'Create mockups for the improved dashboard interface', status: 'COMPLETED', priority: 'HIGH', created_at: '2025-06-13T10:30:44.719357', project_id: 1, assignee_id: 3 },
+        { id: 2, title: 'Implement user authentication', description: 'Add secure login and registration functionality', status: 'COMPLETED', priority: 'HIGH', created_at: '2025-06-13T11:00:44.719357', project_id: 1, assignee_id: 1 },
+        { id: 3, title: 'Create API documentation', description: 'Document all REST API endpoints with examples', status: 'IN_PROGRESS', priority: 'MEDIUM', created_at: '2025-06-13T12:00:44.719357', project_id: 1, assignee_id: 2 },
+        { id: 4, title: 'Setup CI/CD pipeline', description: 'Configure automated testing and deployment', status: 'TODO', priority: 'MEDIUM', created_at: '2025-06-13T13:00:44.719357', project_id: 1, assignee_id: 5 },
+        { id: 5, title: 'Mobile app wireframes', description: 'Design the mobile app user interface', status: 'IN_PROGRESS', priority: 'HIGH', created_at: '2025-06-12T15:00:22.555444', project_id: 2, assignee_id: 4 },
+        { id: 6, title: 'Performance optimization', description: 'Optimize database queries and frontend loading', status: 'TODO', priority: 'LOW', created_at: '2025-06-13T14:00:44.719357', project_id: 1, assignee_id: 3 }
+    ]
+};
 
 // DOM Elements
 const elements = {
@@ -21,6 +48,13 @@ const elements = {
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
+    // Show demo banner if in demo mode
+    if (DEMO_MODE) {
+        document.getElementById('demoBanner').style.display = 'block';
+        document.body.classList.add('demo-mode');
+        showMessage('🎯 Demo Mode Active - Explore the interface with sample data!', 'info');
+    }
+    
     setupEventListeners();
     loadDashboardData();
     setupNavigation();
@@ -171,15 +205,25 @@ async function loadDashboardData() {
 // Load statistics
 async function loadStats() {
     try {
-        const [usersResponse, projectsResponse, tasksResponse] = await Promise.all([
-            fetch(`${API_BASE}/api/users`),
-            fetch(`${API_BASE}/api/projects`),
-            fetch(`${API_BASE}/api/tasks`)
-        ]);
+        let users, projects, tasks;
         
-        const users = await usersResponse.json();
-        const projects = await projectsResponse.json();
-        const tasks = await tasksResponse.json();
+        if (DEMO_MODE) {
+            // Use demo data
+            users = { users: DEMO_DATA.users };
+            projects = { projects: DEMO_DATA.projects };
+            tasks = { tasks: DEMO_DATA.tasks };
+        } else {
+            // Use real API
+            const [usersResponse, projectsResponse, tasksResponse] = await Promise.all([
+                fetch(`${API_BASE}/api/users`),
+                fetch(`${API_BASE}/api/projects`),
+                fetch(`${API_BASE}/api/tasks`)
+            ]);
+            
+            users = await usersResponse.json();
+            projects = await projectsResponse.json();
+            tasks = await tasksResponse.json();
+        }
         
         // Update dashboard stats
         document.getElementById('totalUsers').textContent = users.users?.length || 0;
@@ -204,10 +248,33 @@ async function loadRecentActivity() {
     const activityList = document.getElementById('activityList');
     activityList.innerHTML = '<p class="no-data">Loading recent activity...</p>';
     
-    // For now, show placeholder
-    setTimeout(() => {
-        activityList.innerHTML = '<p class="no-data">No recent activity</p>';
-    }, 1000);
+    if (DEMO_MODE) {
+        // Show demo activities
+        setTimeout(() => {
+            const activities = [
+                { icon: '✅', text: 'Demo Developer completed "Design new dashboard layout"', time: '2 hours ago' },
+                { icon: '🚀', text: 'Admin User created project "TaskFlow Enhancement Project"', time: '1 day ago' },
+                { icon: '👤', text: 'Project Manager joined the team', time: '2 days ago' },
+                { icon: '📋', text: 'Team Lead was assigned to "Mobile app wireframes"', time: '2 days ago' },
+                { icon: '🔄', text: 'Database Migration project marked as completed', time: '3 days ago' }
+            ];
+            
+            activityList.innerHTML = activities.map(activity => `
+                <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: white; margin-bottom: 0.5rem; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <span style="font-size: 1.2rem;">${activity.icon}</span>
+                    <div style="flex: 1;">
+                        <p style="margin: 0; font-size: 0.9rem; color: #333;">${activity.text}</p>
+                        <small style="color: #666;">${activity.time}</small>
+                    </div>
+                </div>
+            `).join('');
+        }, 1000);
+    } else {
+        // For real mode, show placeholder
+        setTimeout(() => {
+            activityList.innerHTML = '<p class="no-data">No recent activity</p>';
+        }, 1000);
+    }
 }
 
 // Load projects
@@ -216,8 +283,16 @@ async function loadProjects() {
     projectsGrid.innerHTML = '<p class="no-data">Loading projects...</p>';
     
     try {
-        const response = await fetch(`${API_BASE}/api/projects`);
-        const result = await response.json();
+        let result;
+        
+        if (DEMO_MODE) {
+            // Use demo data
+            result = { projects: DEMO_DATA.projects };
+        } else {
+            // Use real API
+            const response = await fetch(`${API_BASE}/api/projects`);
+            result = await response.json();
+        }
         
         if (result.projects && result.projects.length > 0) {
             projectsGrid.innerHTML = '';
@@ -274,8 +349,16 @@ async function loadTasks() {
     });
     
     try {
-        const response = await fetch(`${API_BASE}/api/tasks`);
-        const result = await response.json();
+        let result;
+        
+        if (DEMO_MODE) {
+            // Use demo data
+            result = { tasks: DEMO_DATA.tasks };
+        } else {
+            // Use real API
+            const response = await fetch(`${API_BASE}/api/tasks`);
+            result = await response.json();
+        }
         
         // Clear loading messages
         [todoTasks, inProgressTasks, completedTasksList].forEach(container => {
@@ -351,8 +434,16 @@ async function loadUsers() {
     usersTableBody.innerHTML = '<tr><td colspan="6" class="no-data">Loading users...</td></tr>';
     
     try {
-        const response = await fetch(`${API_BASE}/api/users`);
-        const result = await response.json();
+        let result;
+        
+        if (DEMO_MODE) {
+            // Use demo data
+            result = { users: DEMO_DATA.users };
+        } else {
+            // Use real API
+            const response = await fetch(`${API_BASE}/api/users`);
+            result = await response.json();
+        }
         
         if (result.users && result.users.length > 0) {
             usersTableBody.innerHTML = '';

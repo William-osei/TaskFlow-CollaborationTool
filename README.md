@@ -1,5 +1,12 @@
 # TaskFlow Collaboration Tool 🚀
 
+## 🌟 **[LIVE DEMO - Click to View!](https://william-osei.github.io/TaskFlow-CollaborationTool/frontend/)**
+
+> **🚀 Quick Preview**: Want to see the interface immediately? 
+> [**Click here for live demo**](https://william-osei.github.io/TaskFlow-CollaborationTool/frontend/) - No setup required!
+
+---
+
 ## 🎯 Project Overview
 A complete project management and collaboration tool built with Flask backend and modern HTML/CSS/JavaScript frontend. This project was **recovered and rebuilt** from database schemas after data loss, demonstrating resilient development practices.
 
