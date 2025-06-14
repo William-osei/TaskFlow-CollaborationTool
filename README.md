@@ -1,9 +1,11 @@
 # TaskFlow Collaboration Tool 🚀
 
-## 🌟 **[LIVE DEMO - Click to View!](https://william-osei.github.io/TaskFlow-CollaborationTool/frontend/)**
+## 🌟 **[LIVE DEMO - Click to View!](https://william-osei.github.io/TaskFlow-CollaborationTool/)**
 
 > **🚀 Quick Preview**: Want to see the interface immediately? 
-> [**Click here for live demo**](https://william-osei.github.io/TaskFlow-CollaborationTool/frontend/) - No setup required!
+> [**Click here for live demo**](https://william-osei.github.io/TaskFlow-CollaborationTool/) - No setup required!
+> 
+> Features live demo data with 5 users, 3 projects, and 6 tasks in a fully interactive interface!
 
 ---
 
